@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="תקציב חכם">
+<meta name="theme-color" content="#0f0f14">
+<title>תקציב חכם</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#0f0f14;color:#e8e6e1;font-family:-apple-system,Arial,sans-serif;direction:rtl;min-height:100vh;font-size:14px}
+input,select,button{font-family:inherit}
+button{cursor:pointer;border:none;background:none}
+select{-webkit-appearance:none}
+
+.hdr{background:#16161f;border-bottom:1px solid #2a2a38;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.logo{font-size:18px;font-weight:900}
+.sub{font-size:10px;color:#777;margin-top:1px}
+.mnav{display:flex;align-items:center;gap:8px}
+.mbtn{background:#2a2a38;color:#e8e6e1;border-radius:8px;width:30px;height:30px;font-size:18px;display:flex;align-items:center;justify-content:center}
+.mlbl{font-weight:700;font-size:12px;min-width:85px;text-align:center}
+
+.sync-bar{background:#1a2a1a;border-bottom:1px solid #2a3a2a;padding:6px 16px;font-size:11px;color:#4ade80;display:flex;align-items:center;gap:6px}
+.sync-bar.err{background:#2a1a1a;border-color:#3a2a2a;color:#f87171}
+.sync-bar.loading{background:#1a1a2a;border-color:#2a2a3a;color:#93c5fd}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+.tabs{background:#16161f;display:flex;border-bottom:1px solid #2a2a38;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:10px 12px;color:#777;font-size:12px;font-weight:600;white-space:nowrap;border-bottom:2px solid transparent;flex-shrink:0}
+.tab.on{color:#fbbf24;border-bottom-color:#fbbf24}
+
+.pg{max-width:600px;margin:0 auto;padding:12px 12px 90px}
+
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.sc{background:#16161f;border:1px solid #2a2a38;border-radius:12px;padding:11px 9px}
+.sl{font-size:10px;color:#777;margin-bottom:3px}
+.sv{font-size:13px;font-weight:900}
+
+.card{background:#16161f;border:1px solid #2a2a38;border-radius:14px;padding:14px;margin-bottom:10px}
+.ct{font-weight:700;font-size:13px;margin-bottom:10px}
+
+.bi{margin-bottom:10px}
+.bt{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.btr{background:#252530;border-radius:99px;height:6px;overflow:hidden}
+.bf{height:100%;border-radius:99px}
+
+.tx{display:flex;align-items:center;gap:9px;padding:9px 3px;border-bottom:1px solid #1e1e2a}
+.tx:last-child{border-bottom:none}
+.ti{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.tn{flex:1;min-width:0}
+.tnm{font-weight:600;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tdt{font-size:10px;color:#666;margin-top:1px}
+.tam{font-weight:900;font-size:13px;flex-shrink:0;margin-left:2px}
+.tdl{color:#ef4444;font-size:14px;padding:3px 5px;flex-shrink:0;opacity:.7}
+
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.cc{background:#16161f;border:1px solid #2a2a38;border-radius:13px;padding:14px}
+.ce{font-size:20px;margin-bottom:5px}
+.ca{font-size:16px;font-weight:900;margin-bottom:2px}
+.ck{font-size:10px;color:#777}
+
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px}
+.svc{background:#16161f;border:1px solid #1e4e5a;border-radius:13px;padding:14px;border-top:3px solid #06b6d4}
+.svl{font-size:10px;color:#777;margin-bottom:4px}
+.svv{font-size:18px;font-weight:900;color:#06b6d4}
+
+.ob-row{display:flex;align-items:center;margin-bottom:9px}
+.ob-lbl{font-size:12px;flex:1}
+.ob-inp{width:110px;background:#0f0f14;border:1px solid #2a2a38;border-radius:8px;padding:7px 8px;color:#e8e6e1;font-size:14px;font-weight:700;text-align:left;direction:ltr}
+.ob-inp:focus{border-color:#06b6d4;outline:none}
+
+.empty{text-align:center;padding:40px 16px;color:#555}
+.ei{font-size:38px;margin-bottom:9px}
+.et{font-size:13px}
+.eh{font-size:11px;margin-top:4px;color:#444}
+
+.fab{position:fixed;bottom:80px;left:18px;width:52px;height:52px;border-radius:99px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;font-size:25px;font-weight:900;box-shadow:0 4px 16px rgba(251,191,36,.45);display:flex;align-items:center;justify-content:center;z-index:50}
+.fab:active{transform:scale(.92)}
+
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:flex-end;justify-content:center;z-index:100}
+.sh{background:#1a1a24;border-radius:18px 18px 0 0;padding:18px 16px 24px;width:100%;max-width:520px;border:1px solid #2a2a38;border-bottom:none;max-height:92vh;overflow-y:auto;animation:up .25s ease}
+@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sht{font-weight:900;font-size:15px;margin-bottom:14px}
+
+.tog{display:flex;gap:6px;background:#0f0f14;border-radius:10px;padding:3px;margin-bottom:11px}
+.tb{flex:1;padding:8px;border-radius:7px;font-weight:700;font-size:12px;color:#777}
+.tb.ex{background:#ef4444;color:#fff}
+.tb.ic{background:#10b981;color:#fff}
+
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px}
+.fg{margin-bottom:9px}
+.fl{font-size:11px;color:#777;display:block;margin-bottom:3px}
+.fi{width:100%;background:#0f0f14;border:1px solid #2a2a38;border-radius:9px;padding:9px;color:#e8e6e1;font-size:14px}
+.fi:focus{border-color:#fbbf24;outline:none}
+
+.sbg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sbb{padding:8px 5px;border-radius:8px;font-size:11px;font-weight:600;color:#777;border:1px solid #2a2a38;background:#0f0f14}
+.sbb.on{background:#06b6d420;color:#06b6d4;border-color:#06b6d4}
+
+.acts{display:flex;gap:8px;margin-top:14px}
+.bcx{flex:1;padding:11px;border-radius:10px;background:#252530;color:#888;font-weight:700;font-size:13px}
+.bsv{flex:2;padding:11px;border-radius:10px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;font-weight:900;font-size:14px}
+
+.hide{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="logo">💰 תקציב חכם</div>
+    <div class="sub">ניהול כספים משפחתי</div>
+  </div>
+  <div class="mnav">
+    <button class="mbtn" onclick="chMon(1)">&#8249;</button>
+    <div class="mlbl" id="mLbl"></div>
+    <button class="mbtn" onclick="chMon(-1)">&#8250;</button>
+  </div>
+</div>
+
+<div class="sync-bar loading" id="syncBar">
+  <div class="sync-dot"></div>
+  <span id="syncTxt">מתחבר...</span>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="goTab('dash',this)">📊 סקירה</button>
+  <button class="tab" onclick="goTab('txs',this)">📋 תנועות</button>
+  <button class="tab" onclick="goTab('cats',this)">🗂️ קטגוריות</button>
+  <button class="tab" onclick="goTab('sav',this)">💎 חיסכון</button>
+</div>
+
+<div class="pg">
+  <div class="sum">
+    <div class="sc"><div class="sl">⬆️ הכנסות</div><div class="sv" id="si" style="color:#10b981">&#8362;0</div></div>
+    <div class="sc"><div class="sl">⬇️ הוצאות</div><div class="sv" id="se" style="color:#ef4444">&#8362;0</div></div>
+    <div class="sc"><div class="sl">⚖️ מאזן</div><div class="sv" id="sb">&#8362;0</div></div>
+  </div>
+
+  <div id="t-dash">
+    <div id="de" class="empty"><div class="ei">📭</div><div class="et">אין עסקאות לחודש זה</div><div class="eh">לחץ + להוספה</div></div>
+    <div id="dc" class="card hide"><div class="ct">הוצאות לפי קטגוריה</div><div id="db"></div></div>
+    <div id="dr" class="card hide"><div class="ct">עסקאות אחרונות</div><div id="dl"></div></div>
+  </div>
+
+  <div id="t-txs" class="hide">
+    <div class="card"><div class="ct" id="txttl">תנועות</div><div id="txl"></div></div>
+  </div>
+
+  <div id="t-cats" class="hide">
+    <div class="cg" id="cg"></div>
+  </div>
+
+  <div id="t-sav" class="hide">
+    <div class="sg">
+      <div class="svc"><div class="svl">💎 חיסכון כולל</div><div class="svv" id="sa">&#8362;0</div></div>
+      <div class="svc"><div class="svl">📅 החודש</div><div class="svv" id="sm">&#8362;0</div></div>
+    </div>
+    <div class="card">
+      <div class="ct">🏁 יתרות פתיחה</div>
+      <div style="font-size:11px;color:#555;margin-bottom:11px">הזן את הסכום שכבר יש לך בכל אפיק לפני תחילת המעקב</div>
+      <div id="obi"></div>
+    </div>
+    <div class="card"><div class="ct">פירוט לפי אפיק</div><div id="sbr"></div></div>
+    <div class="card"><div class="ct">היסטוריית הפקדות</div><div id="shi"></div></div>
+  </div>
+</div>
+
+<button class="fab" onclick="openF()">+</button>
+
+<div class="ov hide" id="ov" onclick="ovClick(event)">
+  <div class="sh" onclick="event.stopPropagation()">
+    <div class="sht">➕ הוסף עסקה</div>
+    <div class="tog">
+      <button class="tb ex" id="bEx" onclick="setTyp('expense')">⬇️ הוצאה</button>
+      <button class="tb" id="bIn" onclick="setTyp('income')">⬆️ הכנסה</button>
+    </div>
+    <div class="r2">
+      <div><label class="fl">סכום (&#8362;)</label><input class="fi" type="number" id="fA" placeholder="0.00" inputmode="decimal" step="0.01"></div>
+      <div><label class="fl">תאריך</label><input class="fi" type="date" id="fD"></div>
+    </div>
+    <div class="fg">
+      <label class="fl">קטגוריה</label>
+      <select class="fi" id="fC" onchange="onCC()">
+        <option value="food">🍔 אוכל</option>
+        <option value="travel">✈️ נסיעות</option>
+        <option value="education">📚 לימודים</option>
+        <option value="housing">🏠 דיור</option>
+        <option value="health">💊 בריאות</option>
+        <option value="entertainment">🎬 בילוי</option>
+        <option value="savings">💎 חיסכון</option>
+        <option value="other">📦 אחר</option>
+      </select>
+    </div>
+    <div class="fg hide" id="sg">
+      <label class="fl" style="color:#06b6d4">💎 אפיק חיסכון</label>
+      <div class="sbg">
+        <button class="sbb on" onclick="setSub('stock',this)">📈 בורסה</button>
+        <button class="sbb" onclick="setSub('mor',this)">🏦 מור</button>
+        <button class="sbb" onclick="setSub('koupat_gemel',this)">🏛️ קופת גמל</button>
+        <button class="sbb" onclick="setSub('savings_other',this)">💰 אחר</button>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">תיאור (אופציונלי)</label>
+      <input class="fi" type="text" id="fT" placeholder="תיאור קצר...">
+    </div>
+    <div class="acts">
+      <button class="bcx" onclick="closeF()">ביטול</button>
+      <button class="bsv" onclick="saveTx()">שמור ✓</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDVknMth-fqzKK9lt3g0rUTsbDAZkagigs",
+  authDomain: "ahron-2b610.firebaseapp.com",
+  projectId: "ahron-2b610",
+  storageBucket: "ahron-2b610.firebasestorage.app",
+  messagingSenderId: "157151856538",
+  appId: "1:157151856538:web:859f756e22556a78ea9c23"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+var CATS = {
+  food:{l:"🍔 אוכל",c:"#f59e0b"},
+  travel:{l:"✈️ נסיעות",c:"#3b82f6"},
+  education:{l:"📚 לימודים",c:"#8b5cf6"},
+  housing:{l:"🏠 דיור",c:"#10b981"},
+  health:{l:"💊 בריאות",c:"#ef4444"},
+  entertainment:{l:"🎬 בילוי",c:"#ec4899"},
+  savings:{l:"💎 חיסכון",c:"#06b6d4"},
+  other:{l:"📦 אחר",c:"#6b7280"}
+};
+var SUBS = {
+  stock:"📈 בורסה",
+  mor:"🏦 מור",
+  koupat_gemel:"🏛️ קופת גמל",
+  savings_other:"💰 חיסכון אחר"
+};
+var MOS = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
+
+var txs = [];
+var ob = {stock:0,mor:0,koupat_gemel:0,savings_other:0};
+var curTab = "dash";
+var fTyp = "expense";
+var fSub = "stock";
+var now = new Date();
+var fy = now.getFullYear();
+var fm = now.getMonth();
+
+// Sync status
+function setSyncStatus(status, msg) {
+  var bar = document.getElementById("syncBar");
+  var txt = document.getElementById("syncTxt");
+  bar.className = "sync-bar " + status;
+  txt.textContent = msg;
+}
+
+// Load opening balances from Firestore
+async function loadOb() {
+  try {
+    var snap = await getDoc(doc(db, "settings", "opening_balance"));
+    if (snap.exists()) {
+      var data = snap.data();
+      ob.stock = data.stock || 0;
+      ob.mor = data.mor || 0;
+      ob.koupat_gemel = data.koupat_gemel || 0;
+      ob.savings_other = data.savings_other || 0;
+    }
+  } catch(e) {}
+}
+
+// Save opening balance to Firestore
+async function saveOb() {
+  try {
+    await setDoc(doc(db, "settings", "opening_balance"), ob);
+  } catch(e) {}
+}
+
+// Real-time listener for transactions
+onSnapshot(collection(db, "transactions"), function(snapshot) {
+  txs = [];
+  snapshot.forEach(function(d) {
+    var data = d.data();
+    data.firestoreId = d.id;
+    txs.push(data);
+  });
+  // Sort by date descending
+  txs.sort(function(a,b){ return (b.date||"").localeCompare(a.date||""); });
+  setSyncStatus("", "✓ מסונכרן");
+  render();
+}, function(err) {
+  setSyncStatus("err", "שגיאת חיבור");
+});
+
+setSyncStatus("loading", "מתחבר...");
+loadOb().then(function(){ render(); });
+
+function fmt(n) {
+  var s = Math.abs(+n).toFixed(2);
+  var parts = s.split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return "\u20aa" + parts.join(".");
+}
+
+function mKey() { return fy + "-" + (fm+1 < 10 ? "0" : "") + (fm+1); }
+function updLbl() { document.getElementById("mLbl").textContent = MOS[fm] + " " + fy; }
+
+function chMon(d) {
+  fm += d;
+  if (fm < 0) { fm = 11; fy--; }
+  if (fm > 11) { fm = 0; fy++; }
+  updLbl(); render();
+}
+
+function filtered() {
+  var k = mKey();
+  return txs.filter(function(t){ return t.date && t.date.substring(0,7) === k; });
+}
+
+function goTab(tab, btn) {
+  curTab = tab;
+  document.querySelectorAll(".tab").forEach(function(b){ b.classList.remove("on"); });
+  btn.classList.add("on");
+  ["dash","txs","cats","sav"].forEach(function(id){
+    document.getElementById("t-"+id).classList.toggle("hide", id !== tab);
+  });
+  render();
+}
+
+function openF() {
+  document.getElementById("fD").value = new Date().toISOString().substring(0,10);
+  document.getElementById("fA").value = "";
+  document.getElementById("fT").value = "";
+  document.getElementById("fC").value = "food";
+  onCC(); setTyp("expense");
+  document.getElementById("ov").classList.remove("hide");
+}
+
+function closeF() { document.getElementById("ov").classList.add("hide"); }
+function ovClick(e) { if (e.target === document.getElementById("ov")) closeF(); }
+
+function setTyp(t) {
+  fTyp = t;
+  document.getElementById("bEx").className = "tb" + (t === "expense" ? " ex" : "");
+  document.getElementById("bIn").className = "tb" + (t === "income" ? " ic" : "");
+}
+
+function onCC() {
+  document.getElementById("sg").classList.toggle("hide", document.getElementById("fC").value !== "savings");
+}
+
+function setSub(s, btn) {
+  fSub = s;
+  document.querySelectorAll(".sbb").forEach(function(b){ b.classList.remove("on"); });
+  btn.classList.add("on");
+}
+
+async function saveTx() {
+  var amt = parseFloat(document.getElementById("fA").value);
+  if (!amt || amt <= 0) { alert("נא להזין סכום תקין"); return; }
+  var cat = document.getElementById("fC").value;
+  var tx = {
+    type: fTyp,
+    amount: amt,
+    category: cat,
+    savingsSub: cat === "savings" ? fSub : null,
+    description: document.getElementById("fT").value.trim(),
+    date: document.getElementById("fD").value,
+    createdAt: Date.now()
+  };
+  closeF();
+  setSyncStatus("loading", "שומר...");
+  try {
+    await addDoc(collection(db, "transactions"), tx);
+  } catch(e) {
+    setSyncStatus("err", "שגיאה בשמירה");
+    alert("שגיאה בשמירה: " + e.message);
+  }
+}
+
+async function delTx(firestoreId) {
+  if (!confirm("למחוק עסקה זו?")) return;
+  setSyncStatus("loading", "מוחק...");
+  try {
+    await deleteDoc(doc(db, "transactions", firestoreId));
+  } catch(e) {
+    setSyncStatus("err", "שגיאה במחיקה");
+  }
+}
+
+async function setOb(sub, val) {
+  ob[sub] = parseFloat(val) || 0;
+  await saveOb();
+  render();
+}
+
+function txHTML(tx) {
+  var cat = CATS[tx.category] || CATS.other;
+  var sub = tx.savingsSub ? SUBS[tx.savingsSub] : null;
+  var name = tx.description || sub || cat.l;
+  var col = tx.type === "income" ? "#10b981" : "#ef4444";
+  var sign = tx.type === "income" ? "+" : "-";
+  var id = tx.firestoreId;
+  return '<div class="tx">' +
+    '<div class="ti" style="background:' + cat.c + '22">' + cat.l.split(" ")[0] + '</div>' +
+    '<div class="tn"><div class="tnm">' + name + '</div><div class="tdt">' + tx.date + '</div></div>' +
+    '<div class="tam" style="color:' + col + '">' + sign + fmt(tx.amount) + '</div>' +
+    '<button class="tdl" onclick="window._del(\'' + id + '\')">✕</button></div>';
+}
+
+// Expose delete globally (needed for inline onclick)
+window._del = delTx;
+window._setOb = setOb;
+
+function render() {
+  var f = filtered();
+  var inc = f.filter(function(t){return t.type==="income";}).reduce(function(s,t){return s+t.amount;},0);
+  var exp = f.filter(function(t){return t.type==="expense";}).reduce(function(s,t){return s+t.amount;},0);
+  var bal = inc - exp;
+
+  document.getElementById("si").textContent = fmt(inc);
+  document.getElementById("se").textContent = fmt(exp);
+  var sbEl = document.getElementById("sb");
+  sbEl.textContent = fmt(bal);
+  sbEl.style.color = bal >= 0 ? "#fbbf24" : "#ef4444";
+
+  if (curTab === "dash") {
+    var byCat = Object.keys(CATS).map(function(id){
+      return {id:id,cat:CATS[id],total:f.filter(function(t){return t.type==="expense"&&t.category===id;}).reduce(function(s,t){return s+t.amount;},0)};
+    }).filter(function(c){return c.total>0;}).sort(function(a,b){return b.total-a.total;});
+
+    var empty = f.length === 0;
+    document.getElementById("de").classList.toggle("hide", !empty);
+    document.getElementById("dc").classList.toggle("hide", byCat.length === 0);
+    document.getElementById("dr").classList.toggle("hide", empty);
+
+    document.getElementById("db").innerHTML = byCat.map(function(c){
+      var pct = exp > 0 ? Math.min(100,(c.total/exp)*100) : 0;
+      return '<div class="bi"><div class="bt"><span>' + c.cat.l + '</span><span style="font-weight:700">' + fmt(c.total) + '</span></div>' +
+        '<div class="btr"><div class="bf" style="width:' + pct + '%;background:' + c.cat.c + '"></div></div></div>';
+    }).join("");
+    document.getElementById("dl").innerHTML = f.slice(0,5).map(txHTML).join("");
+  }
+
+  if (curTab === "txs") {
+    document.getElementById("txttl").textContent = "תנועות — " + MOS[fm] + " " + fy;
+    document.getElementById("txl").innerHTML = f.length === 0
+      ? '<div class="empty"><div class="ei">📋</div><div class="et">אין עסקאות</div></div>'
+      : f.map(txHTML).join("");
+  }
+
+  if (curTab === "cats") {
+    document.getElementById("cg").innerHTML = Object.keys(CATS).map(function(id){
+      var cat = CATS[id];
+      var tot = f.filter(function(t){return t.type==="expense"&&t.category===id;}).reduce(function(s,t){return s+t.amount;},0);
+      var cnt = f.filter(function(t){return t.category===id;}).length;
+      return '<div class="cc" style="border-top:3px solid ' + cat.c + '">' +
+        '<div class="ce">' + cat.l + '</div>' +
+        '<div class="ca" style="color:' + cat.c + '">' + fmt(tot) + '</div>' +
+        '<div class="ck">' + cnt + ' עסקאות</div></div>';
+    }).join("");
+  }
+
+  if (curTab === "sav") {
+    var allSav = txs.filter(function(t){return t.category==="savings";});
+    var monSav = f.filter(function(t){return t.category==="savings";});
+    var totOB = Object.keys(ob).reduce(function(s,k){return s+(ob[k]||0);},0);
+    var totDep = allSav.reduce(function(s,t){return s+t.amount;},0);
+    var totAll = totOB + totDep;
+    var totMon = monSav.reduce(function(s,t){return s+t.amount;},0);
+
+    document.getElementById("sa").textContent = fmt(totAll);
+    document.getElementById("sm").textContent = fmt(totMon);
+
+    document.getElementById("obi").innerHTML = Object.keys(SUBS).map(function(id){
+      return '<div class="ob-row">' +
+        '<span class="ob-lbl">' + SUBS[id] + '</span>' +
+        '<input class="ob-inp" type="number" inputmode="decimal" placeholder="0" value="' + (ob[id]||0) + '" ' +
+        'onchange="window._setOb(\'' + id + '\',this.value)">' +
+        '</div>';
+    }).join("");
+
+    document.getElementById("sbr").innerHTML = Object.keys(SUBS).map(function(id){
+      var obAmt = ob[id] || 0;
+      var deps = allSav.filter(function(t){return t.savingsSub===id;}).reduce(function(s,t){return s+t.amount;},0);
+      var tot = obAmt + deps;
+      var pct = totAll > 0 ? (tot/totAll)*100 : 0;
+      var hint = obAmt > 0 ? '<div style="font-size:10px;color:#555;margin-top:2px">פתיחה: ' + fmt(obAmt) + ' + הפקדות: ' + fmt(deps) + '</div>' : '';
+      return '<div class="bi"><div class="bt"><span>' + SUBS[id] + '</span><span style="font-weight:700;color:#06b6d4">' + fmt(tot) + '</span></div>' +
+        '<div class="btr"><div class="bf" style="width:' + pct + '%;background:linear-gradient(90deg,#06b6d4,#0891b2)"></div></div>' + hint + '</div>';
+    }).join("");
+
+    document.getElementById("shi").innerHTML = allSav.length === 0
+      ? '<div class="empty"><div class="ei">💎</div><div class="et">אין הפקדות עדיין</div></div>'
+      : allSav.map(function(tx){
+          var sub = SUBS[tx.savingsSub] || "💰 חיסכון";
+          var name = tx.description ? sub + " · " + tx.description : sub;
+          return '<div class="tx">' +
+            '<div class="ti" style="background:#06b6d422">' + sub.split(" ")[0] + '</div>' +
+            '<div class="tn"><div class="tnm">' + name + '</div><div class="tdt">' + tx.date + '</div></div>' +
+            '<div class="tam" style="color:#06b6d4">+' + fmt(tx.amount) + '</div>' +
+            '<button class="tdl" onclick="window._del(\'' + tx.firestoreId + '\')">✕</button></div>';
+        }).join("");
+  }
+}
+
+updLbl();
+render();
+</script>
+</body>
+</html>
